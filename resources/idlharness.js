@@ -566,6 +566,7 @@ IdlArray.prototype.is_json_type = function(type)
        case "Uint8ClampedArray":
        case "BigInt64Array":
        case "BigUint64Array":
+       case "Float16Array":
        case "Float32Array":
        case "Float64Array":
        case "ArrayBuffer":
@@ -733,7 +734,7 @@ IdlArray.prototype.test = function()
 
     Object.getOwnPropertyNames(this.members).forEach(function(memberName) {
         var member = this.members[memberName];
-        if (!(member instanceof IdlInterface)) {
+        if (!(member instanceof IdlInterface || member instanceof IdlNamespace)) {
             return;
         }
 
@@ -1420,7 +1421,7 @@ IdlInterface.prototype.test = function()
         if (!this.untested)
         {
             subsetTestByKey(this.name, test, function() {
-                assert_false(this.name in self);
+                assert_false(this.name in self, this.name + " interface should not exist");
             }.bind(this), this.name + " interface: existence and properties of interface object");
         }
         return;
@@ -2357,12 +2358,13 @@ IdlInterface.prototype.do_member_operation_asserts = function(memberHolderObject
     assert_equals(typeof memberHolderObject[member.name], "function",
                   "property must be a function");
 
-    const ctors = this.members.filter(function(m) {
-        return m.type == "operation" && m.name == member.name;
+    const operationOverloads = this.members.filter(function(m) {
+        return m.type == "operation" && m.name == member.name &&
+            (m.special === "static") === (member.special === "static");
     });
     assert_equals(
         memberHolderObject[member.name].length,
-        minOverloadLength(ctors),
+        minOverloadLength(operationOverloads),
         "property has wrong .length");
     assert_equals(
         memberHolderObject[member.name].name,
@@ -2668,6 +2670,7 @@ IdlInterface.prototype.test_member_stringifier = function(member)
 
 IdlInterface.prototype.test_members = function()
 {
+    var unexposed_members = new Set();
     for (var i = 0; i < this.members.length; i++)
     {
         var member = this.members[i];
@@ -2676,15 +2679,18 @@ IdlInterface.prototype.test_members = function()
         }
 
         if (!exposed_in(exposure_set(member, this.exposureSet))) {
-            subsetTestByKey(this.name, test, function() {
-                // It's not exposed, so we shouldn't find it anywhere.
-                assert_false(member.name in this.get_interface_object(),
-                             "The interface object must not have a property " +
-                             format_value(member.name));
-                assert_false(member.name in this.get_interface_object().prototype,
-                             "The prototype object must not have a property " +
-                             format_value(member.name));
-            }.bind(this), this.name + " interface: member " + member.name);
+            if (!unexposed_members.has(member.name)) {
+                unexposed_members.add(member.name);
+                subsetTestByKey(this.name, test, function() {
+                    // It's not exposed, so we shouldn't find it anywhere.
+                    assert_false(member.name in this.get_interface_object(),
+                                "The interface object must not have a property " +
+                                format_value(member.name));
+                    assert_false(member.name in this.get_interface_object().prototype,
+                                "The prototype object must not have a property " +
+                                format_value(member.name));
+                }.bind(this), this.name + " interface: member " + member.name);
+            }
             continue;
         }
 
@@ -2855,17 +2861,23 @@ IdlInterface.prototype.test_interface_of = function(desc, obj, exception, expect
         return;
     }
 
+    var unexposed_properties = new Set();
     for (var i = 0; i < this.members.length; i++)
     {
         var member = this.members[i];
         if (member.untested) {
             continue;
         }
-        if (!exposed_in(exposure_set(member, this.exposureSet))) {
-            subsetTestByKey(this.name, test, function() {
-                assert_equals(exception, null, "Unexpected exception when evaluating object");
-                assert_false(member.name in obj);
-            }.bind(this), this.name + " interface: " + desc + ' must not have property "' + member.name + '"');
+        if (!exposed_in(exposure_set(member, this.exposureSet)))
+        {
+            if (!unexposed_properties.has(member.name))
+            {
+                unexposed_properties.add(member.name);
+                subsetTestByKey(this.name, test, function() {
+                    assert_equals(exception, null, "Unexpected exception when evaluating object");
+                    assert_false(member.name in obj);
+                }.bind(this), this.name + " interface: " + desc + ' must not have property "' + member.name + '"');
+            }
             continue;
         }
         if (member.type == "attribute" && member.isUnforgeable)
@@ -3439,6 +3451,17 @@ IdlNamespace.prototype.test_self = function ()
 
 IdlNamespace.prototype.test = function ()
 {
+    // If the namespace object is not exposed, only test that. Members can't be
+    // tested either
+    if (!this.exposed) {
+        if (!this.untested) {
+            subsetTestByKey(this.name, test, function() {
+                assert_false(this.name in self, this.name + " namespace should not exist");
+            }.bind(this), this.name + " namespace: existence and properties of namespace object");
+        }
+        return;
+    }
+
     if (!this.untested) {
         this.test_self();
     }
@@ -3486,7 +3509,7 @@ function idl_test(srcs, deps, idl_setup_func) {
             "require-exposed"
         ];
         return Promise.all(
-            srcs.concat(deps).map(fetch_spec))
+            srcs.concat(deps).map(globalThis.fetch_spec))
             .then(function(results) {
                 const astArray = results.map(result =>
                     WebIDL2.parse(result.idl, { sourceName: result.spec })
@@ -3527,9 +3550,11 @@ function idl_test(srcs, deps, idl_setup_func) {
             });
     }, 'idl_test setup');
 }
+globalThis.idl_test = idl_test;
 
 /**
  * fetch_spec is a shorthand for a Promise that fetches the spec's content.
+ * Note: ShadowRealm-specific implementation in testharness-shadowrealm-inner.js
  */
 function fetch_spec(spec) {
     var url = '/interfaces/' + spec + '.idl';

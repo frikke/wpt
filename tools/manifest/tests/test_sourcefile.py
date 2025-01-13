@@ -42,6 +42,8 @@ def items(s):
     "crashtests/foo.html.ini",
     "css/common/test.html",
     "css/CSS2/archive/test.html",
+    "css/WEB_FEATURES.yml",
+    "css/META.yml",
 ])
 def test_name_is_non_test(rel_path):
     s = create(rel_path)
@@ -235,7 +237,7 @@ test()"""
 
 
 def test_worker_with_variants():
-    contents = b"""// META: variant=
+    contents = b"""// META: variant=?default
 // META: variant=?wss
 test()"""
 
@@ -255,7 +257,7 @@ test()"""
 
     expected_urls = [
         "/html/test.worker.html" + suffix
-        for suffix in ["", "?wss"]
+        for suffix in ["?default", "?wss"]
     ]
     assert len(items) == len(expected_urls)
 
@@ -265,7 +267,7 @@ test()"""
 
 
 def test_window_with_variants():
-    contents = b"""// META: variant=
+    contents = b"""// META: variant=?default
 // META: variant=?wss
 test()"""
 
@@ -285,7 +287,7 @@ test()"""
 
     expected_urls = [
         "/html/test.window.html" + suffix
-        for suffix in ["", "?wss"]
+        for suffix in ["?default", "?wss"]
     ]
     assert len(items) == len(expected_urls)
 
@@ -429,7 +431,7 @@ test()"""
 
 def test_multi_global_with_variants():
     contents = b"""// META: global=window,worker
-// META: variant=
+// META: variant=?default
 // META: variant=?wss
 test()"""
 
@@ -456,7 +458,7 @@ test()"""
     expected_urls = sorted(
         urls[ty] + suffix
         for ty in ["dedicatedworker", "serviceworker", "sharedworker", "window"]
-        for suffix in ["", "?wss"]
+        for suffix in ["?default", "?wss"]
     )
     assert len(items) == len(expected_urls)
 
@@ -524,6 +526,40 @@ def test_testharness_variant_invalid(variant):
 
     with pytest.raises(ValueError):
         s.test_variants
+
+
+def test_reftest_variant():
+    content = (b"<meta name=variant content=\"?first\">" +
+               b"<meta name=variant content=\"?second\">" +
+               b"<link rel=\"match\" href=\"ref.html\">")
+
+    s = create("html/test.html", contents=content)
+    assert not s.name_is_non_test
+    assert not s.name_is_manual
+    assert not s.name_is_visual
+    assert not s.name_is_worker
+    assert not s.name_is_reference
+
+    item_type, items = s.manifest_items()
+    assert item_type == "reftest"
+
+    actual_tests = [
+        {"url": item.url, "refs": item.references}
+        for item in items
+    ]
+
+    expected_tests = [
+        {
+            "url": "/html/test.html?first",
+            "refs": [("/html/ref.html?first", "==")],
+        },
+        {
+            "url": "/html/test.html?second",
+            "refs": [("/html/ref.html?second", "==")],
+        },
+    ]
+
+    assert actual_tests == expected_tests
 
 
 @pytest.mark.parametrize("ext", ["htm", "html"])
@@ -808,9 +844,24 @@ def test_spec_links_whitespace(url):
     assert s.spec_links == {"http://example.com/"}
 
 
+@pytest.mark.parametrize("input,expected", [
+    (b"""<link rel="help" title="Intel" href="foo">\n""", ["foo"]),
+    (b"""<link rel=help title="Intel" href="foo">\n""", ["foo"]),
+    (b"""<link  rel=help  href="foo" >\n""", ["foo"]),
+    (b"""<link rel="author" href="foo">\n""", []),
+    (b"""<link href="foo">\n""", []),
+    (b"""<link rel="help" href="foo">\n<link rel="help" href="bar">\n""", ["foo", "bar"]),
+    (b"""<link rel="help" href="foo">\n<script>\n""", ["foo"]),
+    (b"""random\n""", []),
+])
+def test_spec_links_complex(input, expected):
+    s = create("foo/test.html", input)
+    assert s.spec_links == set(expected)
+
+
 def test_url_base():
     contents = b"""// META: global=window,worker
-// META: variant=
+// META: variant=?default
 // META: variant=?wss
 test()"""
 
@@ -819,13 +870,13 @@ test()"""
 
     assert item_type == "testharness"
 
-    assert [item.url for item in items] == ['/_fake_base/html/test.any.html',
+    assert [item.url for item in items] == ['/_fake_base/html/test.any.html?default',
                                             '/_fake_base/html/test.any.html?wss',
-                                            '/_fake_base/html/test.any.serviceworker.html',
+                                            '/_fake_base/html/test.any.serviceworker.html?default',
                                             '/_fake_base/html/test.any.serviceworker.html?wss',
-                                            '/_fake_base/html/test.any.sharedworker.html',
+                                            '/_fake_base/html/test.any.sharedworker.html?default',
                                             '/_fake_base/html/test.any.sharedworker.html?wss',
-                                            '/_fake_base/html/test.any.worker.html',
+                                            '/_fake_base/html/test.any.worker.html?default',
                                             '/_fake_base/html/test.any.worker.html?wss']
 
     assert items[0].url_base == "/_fake_base/"
@@ -909,3 +960,56 @@ def test_page_ranges_invalid(page_ranges):
 def test_hash():
     s = SourceFile("/", "foo", "/", contents=b"Hello, World!")
     assert "b45ef6fec89518d314f546fd6c3025367b721684" == s.hash
+
+
+@pytest.mark.parametrize("file_name",
+                         ["html/test.worker.js", "html/test.window.js"])
+def test_script_testdriver_missing_features(file_name):
+    contents = """// META: title=TEST_TITLE
+// META: script=/resources/testdriver.js
+    test()""".encode("utf-8")
+
+    s = create(file_name, contents=contents)
+    item_type, items = s.manifest_items()
+    for item in items:
+        assert item.testdriver_features is None
+
+
+@pytest.mark.parametrize("features",
+                         [[], ['feature_1'], ['feature_1', 'feature_2']])
+@pytest.mark.parametrize("file_name",
+                         ["html/test.worker.js", "html/test.window.js"])
+def test_script_testdriver_features(file_name, features):
+    contents = f"""// META: title=TEST_TITLE
+// META: script=/resources/testdriver.js?{"&".join('feature=' + f for f in features)}
+    test()""".encode("utf-8")
+
+    s = create(file_name, contents=contents)
+    item_type, items = s.manifest_items()
+    for item in items:
+        assert item.testdriver_features == (
+            features if len(features) > 0 else None)
+
+
+def test_html_testdriver_missing_features():
+    contents = """
+<!--Required to make test type `testharness` -->
+<script src="/resources/testharness.js"></script>
+<script src="/resources/testdriver.js"></script>
+    """.encode("utf-8")
+
+    s = create("html/test.html", contents=contents)
+    assert s.testdriver_features is None
+
+
+@pytest.mark.parametrize("features",
+                         [['feature_1'], ['feature_1', 'feature_2']])
+def test_html_testdriver_features(features):
+    contents = f"""
+<script src="/resources/testdriver.js?{"&".join('feature=' + f for f in features)}"></script>
+<!--Required to make test type `testharness` -->
+<script src="/resources/testharness.js?feature=bidi"></script>
+    """.encode("utf-8")
+
+    s = create("html/test.html", contents=contents)
+    assert s.testdriver_features == features

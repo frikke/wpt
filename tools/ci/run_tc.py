@@ -46,8 +46,8 @@ import tarfile
 import tempfile
 import zipfile
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from wpt.utils import get_download_to_descriptor  # type: ignore
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from tools.wpt.utils import get_download_to_descriptor
 
 root = os.path.abspath(
     os.path.join(os.path.dirname(__file__),
@@ -75,7 +75,6 @@ def get_parser():
     p = argparse.ArgumentParser()
     p.add_argument("--oom-killer",
                    action="store_true",
-                   default=False,
                    help="Run userspace OOM killer")
     p.add_argument("--hosts",
                    dest="hosts_file",
@@ -91,8 +90,7 @@ def get_parser():
                    default=[],
                    help="Browsers that will be used in the job")
     p.add_argument("--channel",
-                   default=None,
-                   choices=["experimental", "dev", "nightly", "beta", "stable"],
+                   choices=["experimental", "canary", "dev", "nightly", "beta", "stable"],
                    help="Chrome browser channel")
     p.add_argument("--xvfb",
                    action="store_true",
@@ -140,7 +138,22 @@ def install_certificates():
     run(["sudo", "update-ca-certificates"])
 
 
+def start_dbus():
+    # Start system bus
+    run(["sudo", "service", "dbus", "start"])
+    # Start user bus and set env
+    dbus_env = run(["dbus-launch"], return_stdout=True)
+    for dbus_env_line in dbus_env.splitlines():
+        dbus_env_name, dbus_env_value = dbus_env_line.split("=", 1)
+        assert (dbus_env_name.startswith("DBUS_SESSION"))
+        os.environ[dbus_env_name] = dbus_env_value
+    assert ("DBUS_SESSION_BUS_ADDRESS" in os.environ)
+
+
 def install_chrome(channel):
+    if channel == "canary":
+        # Chrome for Testing Canary is installed via --install-browser
+        return
     if channel in ("experimental", "dev"):
         deb_archive = "google-chrome-unstable_current_amd64.deb"
     elif channel == "beta":
@@ -257,6 +270,10 @@ def setup_environment(args):
     if "chrome" in args.browser:
         assert args.channel is not None
         install_chrome(args.channel)
+
+    # These browsers use dbus for various features.
+    if any(b in args.browser for b in ["chrome", "webkitgtk_minibrowser"]):
+        start_dbus()
 
     if args.xvfb:
         start_xvfb()
