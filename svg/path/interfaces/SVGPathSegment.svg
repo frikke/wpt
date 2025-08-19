@@ -1,15 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     xmlns:h="http://www.w3.org/1999/xhtml">
-  <metadata>
-    <h:link rel="help" href="https://svgwg.org/specs/paths/#InterfaceSVGPathSegment"/>
-  </metadata>
-  <h:script src="/resources/testharness.js"/>
-  <h:script src="/resources/testharnessreport.js"/>
-
-  <path id="track" d="m 10 20 h 30"/>S
-
-  <script><![CDATA[
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:h="http://www.w3.org/1999/xhtml"><metadata><h:link href="https://svgwg.org/specs/paths/#InterfaceSVGPathSegment" rel="help"/></metadata><h:script src="/resources/testharness.js"/><h:script src="/resources/testharnessreport.js"/><path id="track" d="m 10 20 h 30"/>S<script><![CDATA[
   test(function() {
     let track = document.getElementById('track');
     assert_equals(Object.getPrototypeOf(track), SVGPathElement.prototype);
@@ -201,5 +190,4 @@
     }, "Test path.setPathData()" + t.description);
   });
 
-  ]]></script>
-</svg>
+  ]]></script></svg>
