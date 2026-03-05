@@ -1,11 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     xmlns:h="http://www.w3.org/1999/xhtml">
-  <metadata>
-    <h:link rel="help" href="https://svgwg.org/svg2-draft/paths.html#TheDProperty"/>
-    <h:link rel="match" href="d-none-ref.svg"/>
-    <h:meta name="assert" content="Setting 'd: none' overrides the 'd' SVG attribute."/>
-  </metadata>
-  <path d="M 0 0 H 100 V 100 H 0 Z" fill="green" />
-  <path d="M 0 0 H 100 V 100 H 0 Z" fill="red" style="d: none" />
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:h="http://www.w3.org/1999/xhtml"><metadata><h:link href="https://svgwg.org/svg2-draft/paths.html#TheDProperty" rel="help"/><h:link href="d-none-ref.svg" rel="match"/><h:meta content="Setting 'd: none' overrides the 'd' SVG attribute." name="assert"/></metadata><path fill="green" d="M 0 0 H 100 V 100 H 0 Z"/><path fill="red" d="M 0 0 H 100 V 100 H 0 Z" style="d:none"/></svg>
