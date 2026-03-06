@@ -1,22 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     xmlns:h="http://www.w3.org/1999/xhtml"
-     width="800px" height="1000px">
-  <title>innerHTML setter and XML namespaces</title>
-  <metadata>
-    <h:link rel="help" href="https://html.spec.whatwg.org/multipage/dynamic-markup-insertion.html#the-innerhtml-property"/>
-  </metadata>
-  <h:script src="/resources/testharness.js"/>
-  <h:script src="/resources/testharnessreport.js"/>
-
-  <foreignObject>
-    <h:body>
-      <h:div/>
-      <g/>
-      <element xmlns=""/>
-      <element xmlns="https://example.org/ns"/>
-
-      <h:script><![CDATA[
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:h="http://www.w3.org/1999/xhtml" width="800" height="1000"><title>innerHTML setter and XML namespaces</title><metadata><h:link href="https://html.spec.whatwg.org/multipage/dynamic-markup-insertion.html#the-innerhtml-property" rel="help"/></metadata><h:script src="/resources/testharness.js"/><h:script src="/resources/testharnessreport.js"/><foreignObject><h:body><h:div/><element/><element xmlns="https://example.org/ns"/><h:script><![CDATA[
       "use strict";
 
       const SVG_NS = "http://www.w3.org/2000/svg";
@@ -99,7 +81,4 @@
         assert_equals(prefixedContainer.firstChild.firstChild.firstChild.firstChild.namespaceURI, "https://example.com/new-default");
       }, "declaring default namespace inside of fragment parsed by innerHTML");
 
-      ]]></h:script>
-    </h:body>
-  </foreignObject>
-</svg>
+      ]]></h:script></h:body></foreignObject></svg>

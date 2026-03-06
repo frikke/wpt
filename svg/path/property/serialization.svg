@@ -1,16 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     xmlns:h="http://www.w3.org/1999/xhtml">
-  <metadata>
-    <h:link rel="help" href="https://svgwg.org/svg2-draft/paths.html#TheDProperty"/>
-    <h:meta name="assert" content="computed d is serialized using absolute commands"/>
-  </metadata>
-  <path id="target"></path>
-  <h:script src="/resources/testharness.js"/>
-  <h:script src="/resources/testharnessreport.js"/>
-  <h:script src="/css/support/parsing-testcommon.js"/>
-  <h:script src="/css/support/computed-testcommon.js"/>
-  <script><![CDATA[
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:h="http://www.w3.org/1999/xhtml"><metadata><h:link href="https://svgwg.org/svg2-draft/paths.html#TheDProperty" rel="help"/><h:meta content="computed d is serialized using absolute commands" name="assert"/></metadata><path id="target"/><h:script src="/resources/testharness.js"/><h:script src="/resources/testharnessreport.js"/><h:script src="/css/support/parsing-testcommon.js"/><h:script src="/css/support/computed-testcommon.js"/><script><![CDATA[
   let test1 = 'path("m 10 20 q 30 60 40 50 q 100 70 90 80")';
   test_valid_value('d', test1);
   test_computed_value('d', test1, 'path("M 10 20 Q 40 80 50 70 Q 150 140 140 150")');
@@ -30,5 +18,4 @@
   let test5 = '  path(  "m 10 20 a 10 20 30 1 0 40 50 a 110 120 30 1 1 140 50"  )';
   test_valid_value('d', test5, 'path("m 10 20 a 10 20 30 1 0 40 50 a 110 120 30 1 1 140 50")');
   test_computed_value('d', test5, 'path("M 10 20 A 10 20 30 1 0 50 70 A 110 120 30 1 1 190 120")');
-  ]]></script>
-</svg>
+  ]]></script></svg>

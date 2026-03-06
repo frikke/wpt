@@ -1,5 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg">
-  <symbol viewBox="0 0 16 16" id="blue">
-    <rect width="16" height="16" fill="blue"/>
-  </symbol>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg"><symbol id="blue" viewBox="0 0 16 16"><rect width="16" height="16" fill="#00f"/></symbol></svg>
