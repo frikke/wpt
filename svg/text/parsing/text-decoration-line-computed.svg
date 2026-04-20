@@ -1,16 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     xmlns:h="http://www.w3.org/1999/xhtml">
-  <title>SVG Text CSS Decoration Test: getComputedStyle().textDecorationLine</title>
-  <metadata>
-    <h:link rel="help" ref="https://drafts.csswg.org/css-text-decor-4/#text-decoration-line-property"/>
-    <h:meta name="assert" content="SVG text-decoration-line computed value is as specified."/>
-  </metadata>
-  <g id="target"></g>
-  <h:script src="/resources/testharness.js"/>
-  <h:script src="/resources/testharnessreport.js"/>
-  <h:script src="/css/support/computed-testcommon.js"/>
-  <script><![CDATA[
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:h="http://www.w3.org/1999/xhtml"><title>SVG Text CSS Decoration Test: getComputedStyle().textDecorationLine</title><metadata><h:link ref="https://drafts.csswg.org/css-text-decor-4/#text-decoration-line-property" rel="help"/><h:meta content="SVG text-decoration-line computed value is as specified." name="assert"/></metadata><h:script src="/resources/testharness.js"/><h:script src="/resources/testharnessreport.js"/><h:script src="/css/support/computed-testcommon.js"/><script><![CDATA[
 
 // none
 test_computed_value("text-decoration-line", "none");
@@ -38,5 +26,4 @@ test_computed_value("text-decoration-line", "spelling-error");
 // grammar-error
 test_computed_value("text-decoration-line", "grammar-error");
 
-  ]]></script>
-</svg>
+  ]]></script></svg>
