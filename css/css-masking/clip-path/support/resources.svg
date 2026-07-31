@@ -1,5 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg">
-  <clipPath id="circleClip" clipPathUnits="objectBoundingBox">
-    <circle cx="0.5" cy="0.5" r="0.5"/>
-  </clipPath>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg"><clipPath id="circleClip" clipPathUnits="objectBoundingBox"><circle cx=".5" cy=".5" r=".5"/></clipPath></svg>
