@@ -1,41 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg"
-     xmlns:html="http://www.w3.org/1999/xhtml"
-     viewBox="0 0 200 200">
-  <title>SVG ellipse rx/ry auto resolution affects SVGGeometryElement methods</title>
-  <metadata>
-    <html:link rel="help" href="https://w3c.github.io/svgwg/svg2-draft/shapes.html#EllipseElement"/>
-    <html:link rel="help" href="https://w3c.github.io/svgwg/svg2-draft/types.html#InterfaceSVGGeometryElement"/>
-    <html:meta name="assert" content="Per SVG 2 §10.4, an 'auto' value for either rx or ry on an ellipse resolves to the used value of the other property; if both are auto, both used values are 0. This resolution must apply uniformly to every SVGGeometryElement method (getTotalLength, getPointAtLength, isPointInFill, isPointInStroke)."/>
-  </metadata>
-  <html:script src="/resources/testharness.js"/>
-  <html:script src="/resources/testharnessreport.js"/>
-
-  <ellipse id="auto-rx" cx="50" cy="50" rx="auto" ry="50"/>
-  <ellipse id="auto-ry" cx="50" cy="50" rx="50" ry="auto"/>
-  <ellipse id="auto-both" cx="50" cy="50"/>
-  <ellipse id="explicit" cx="50" cy="50" rx="50" ry="50"/>
-
-  <ellipse id="stroke-auto-rx" cx="100" cy="100" rx="auto" ry="50"
-           stroke="black" stroke-width="4" stroke-dasharray="4 2" fill="none"/>
-  <ellipse id="stroke-auto-ry" cx="100" cy="100" rx="50" ry="auto"
-           stroke="black" stroke-width="4" stroke-dasharray="4 2" fill="none"/>
-  <ellipse id="stroke-explicit" cx="100" cy="100" rx="50" ry="50"
-           stroke="black" stroke-width="4" stroke-dasharray="4 2" fill="none"/>
-
-  <!--
-    Percentage cases. Inner <svg> establishes its own 200x100 viewport so
-    that a percentage on rx resolves against width=200 and a percentage on
-    ry resolves against height=100. With auto on the other axis, the used
-    value of the auto axis equals the resolved (axis-correct) pixel value
-    of the non-auto axis.
-  -->
-  <svg id="pct-viewport" x="0" y="200" width="200" height="100">
-    <ellipse id="pct-auto-rx-50ry" cx="100" cy="50" rx="auto" ry="50%"/>
-    <ellipse id="pct-50rx-auto-ry" cx="100" cy="50" rx="50%"  ry="auto"/>
-    <ellipse id="pct-auto-rx-25ry" cx="100" cy="50" rx="auto" ry="25%"/>
-  </svg>
-
-  <script><![CDATA[
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:html="http://www.w3.org/1999/xhtml" viewBox="0 0 200 200"><title>SVG ellipse rx/ry auto resolution affects SVGGeometryElement methods</title><metadata><html:link href="https://w3c.github.io/svgwg/svg2-draft/shapes.html#EllipseElement" rel="help"/><html:link href="https://w3c.github.io/svgwg/svg2-draft/types.html#InterfaceSVGGeometryElement" rel="help"/><html:meta content="Per SVG 2 §10.4, an 'auto' value for either rx or ry on an ellipse resolves to the used value of the other property; if both are auto, both used values are 0. This resolution must apply uniformly to every SVGGeometryElement method (getTotalLength, getPointAtLength, isPointInFill, isPointInStroke)." name="assert"/></metadata><html:script src="/resources/testharness.js"/><html:script src="/resources/testharnessreport.js"/><ellipse id="auto-rx" cx="50" cy="50" rx="auto" ry="50"/><ellipse id="auto-ry" cx="50" cy="50" rx="50" ry="auto"/><ellipse id="auto-both" cx="50" cy="50"/><ellipse id="explicit" cx="50" cy="50" rx="50" ry="50"/><ellipse id="stroke-auto-rx" cx="100" cy="100" fill="none" stroke="#000" stroke-dasharray="4 2" stroke-width="4" rx="auto" ry="50"/><ellipse id="stroke-auto-ry" cx="100" cy="100" fill="none" stroke="#000" stroke-dasharray="4 2" stroke-width="4" rx="50" ry="auto"/><ellipse id="stroke-explicit" cx="100" cy="100" fill="none" stroke="#000" stroke-dasharray="4 2" stroke-width="4" rx="50" ry="50"/><svg id="pct-viewport" width="200" height="100" x="0" y="200"><ellipse id="pct-auto-rx-50ry" cx="100" cy="50" rx="auto" ry="50%"/><ellipse id="pct-50rx-auto-ry" cx="100" cy="50" rx="50%" ry="auto"/><ellipse id="pct-auto-rx-25ry" cx="100" cy="50" rx="auto" ry="25%"/></svg><script><![CDATA[
     'use strict';
 
     test(function() {
@@ -118,5 +81,4 @@
       assert_approx_equals(p.x, 150, 0.5, 'auto-rx + ry=50% starting point x');
       assert_approx_equals(p.y, 50,  0.5, 'auto-rx + ry=50% starting point y');
     }, document.title + ', getPointAtLength(0) with percentage ry uses height-axis resolution.');
-  ]]></script>
-</svg>
+  ]]></script></svg>
