@@ -1,3 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
-  <rect x="env(--x, 0)" width="50" height="100" fill="#0a5c2e"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="50" height="100" x="env(--x 0)" fill="#0a5c2e"/></svg>
