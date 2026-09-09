@@ -1,21 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     xmlns:h="http://www.w3.org/1999/xhtml">
-    <title>SVG Test: focus - resetting an explicitly set tabindex</title>
-    <metadata>
-        <h:link rel="help" href="https://w3c.github.io/svgwg/svg2-draft/interact.html#Focus"/>
-        <h:link rel="help" href="https://html.spec.whatwg.org/multipage/interaction.html#attr-tabindex"/>
-        <h:meta name="assert" content="Verify that an explicitly set tabIndex is reset to the default value when the tabindex attribute is changed to a value that is not a valid integer, or removed"/>
-    </metadata>
-    <a id="anchor" href="#"></a>
-    <rect id="rect"></rect>
-    <g id="g"></g>
-    <circle id="circle"></circle>
-    <text id="text"></text>
-    <svg id="nested"></svg>
-    <h:script src="/resources/testharness.js"/>
-    <h:script src="/resources/testharnessreport.js"/>
-    <script><![CDATA[
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:h="http://www.w3.org/1999/xhtml"><title>SVG Test: focus - resetting an explicitly set tabindex</title><metadata><h:link href="https://w3c.github.io/svgwg/svg2-draft/interact.html#Focus" rel="help"/><h:link href="https://html.spec.whatwg.org/multipage/interaction.html#attr-tabindex" rel="help"/><h:meta content="Verify that an explicitly set tabIndex is reset to the default value when the tabindex attribute is changed to a value that is not a valid integer, or removed" name="assert"/></metadata><rect id="rect"/><circle id="circle"/><svg id="nested"/><h:script src="/resources/testharness.js"/><h:script src="/resources/testharnessreport.js"/><script><![CDATA[
     // tabindex is defined by HTML, which parses the attribute as an integer and
     // falls back to the default tab index for any value that fails to parse.
     // That includes the empty string, garbage, and out-of-range integers.
@@ -74,5 +57,4 @@
             assert_equals(el.tabIndex, expectedDefault, "attribute removed");
         }, `removing tabindex resets ${id}.tabIndex`);
     }
-    ]]></script>
-</svg>
+    ]]></script></svg>
